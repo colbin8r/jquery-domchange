@@ -10,8 +10,8 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   (function($, window) {
-    var DOMChangePlugin, defaults, pluginName;
-    pluginName = 'domchange';
+    var DOMChangeEventHandler, defaults, eventName;
+    eventName = 'domchange';
     defaults = {
       events: {
         attributes: true,
@@ -25,18 +25,22 @@
       },
       attributeFilter: null
     };
-    DOMChangePlugin = (function() {
-      function DOMChangePlugin(element, options) {
+    DOMChangeEventHandler = (function() {
+      function DOMChangeEventHandler(element, options) {
         this.element = element;
         this.callback = __bind(this.callback, this);
-        this.options = $.extend({}, defaults, options);
+        this._eventName = eventName;
         this._defaults = defaults;
-        this._name = pluginName;
-        this.init();
+        this._options = options;
+        this.options = $.extend({}, defaults, options);
+        this.hook();
       }
 
-      DOMChangePlugin.prototype.init = function() {
+      DOMChangeEventHandler.prototype.hook = function() {
         var MutationObserver;
+        if (this.observer != null) {
+          return;
+        }
         MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
         this.observer = new MutationObserver(this.callback);
         return this.observer.observe(this.element, {
@@ -49,19 +53,37 @@
         });
       };
 
-      DOMChangePlugin.prototype.callback = function(mutations) {
-        return $(this.element).trigger('domchange', mutations);
+      DOMChangeEventHandler.prototype.unhook = function() {
+        if (this.observer == null) {
+          return;
+        }
+        this.observer.disconnect();
+        return this.observer = null;
       };
 
-      return DOMChangePlugin;
+      DOMChangeEventHandler.prototype.callback = function(changes) {
+        return $(this.element).trigger('domchange', changes);
+      };
+
+      return DOMChangeEventHandler;
 
     })();
-    return $.fn[pluginName] = function(options) {
-      return this.each(function() {
-        if ($.data(this, 'plugin_#{pluginName}') == null) {
-          return $.data(this, 'plugin_#{pluginName}', new DOMChangePlugin(this, options));
-        }
-      });
+    return jQuery.event.special[eventName] = {
+      add: function(params) {
+        var element, handler, id, options;
+        options = params.data;
+        id = 'domchange_' + params.guid;
+        element = this;
+        handler = new DOMChangeEventHandler(element, options);
+        return $.data(element, id, handler);
+      },
+      remove: function(params) {
+        var element, handler, id;
+        id = 'domchange_' + params.guid;
+        element = this;
+        handler = $.data(element, id);
+        return handler.unhook();
+      }
     };
   })(jQuery, window);
 
