@@ -18,13 +18,13 @@ $("#observable").domchange().on("domchange", function(event, changes) {
 Just call the `domchange()` event on an element or elements to begin watching for changes to the DOM:
 
 ```js
-$("#observable").domchange();`
+$("#observable").domchange();
 ```
 
 After that, you can simply listen for the `domchange` event as you would with any other event:
 
 ```js
-$("observable").on("domchange", function() {
+$("#observable").on("domchange", function() {
     // something happened to the DOM!    
 }
 ```
@@ -56,7 +56,7 @@ There are several different types of changes that jquery-domchange can listen fo
 By default, the plugin will listen for all three. However, if you only need to watch for specific types of changes, you can turn off the ones you don't need by disabling them when configuring the plugin:
 
 ```js
-$("observable").domchange({
+$("#observable").domchange({
     events: {
         attributes: true,
         children: false,
@@ -68,7 +68,7 @@ $("observable").domchange({
 If you're listening to attribute changes, you can filter which attributes you care about by whitelisting them:
 
 ```js
-$("observable").domchange({
+$("#observable").domchange({
     attributeFilter: true
 });
 ```
@@ -80,7 +80,7 @@ $("observable").domchange({
 You can also choose whether or not you want to listen to changes to the element's children as well. The plugin enables that functionality by default; however, you can disable it to save performance:
 
 ```js
-$("observable").domchange({
+$("#observable").domchange({
     descendents: false
 });
 ```
@@ -90,7 +90,7 @@ $("observable").domchange({
 When an element's attributes or character data changes, you can specically request the old value by configuring the plugin to remember it:
 
 ```js
-$("observable").domchange({
+$("#observable").domchange({
     recordPriorValues: {
         attributes: true,
         characterData: true
@@ -101,7 +101,7 @@ $("observable").domchange({
 You can then access the old value in your listener:
 
 ```js
-$("observable").on("domchange", function(event, changes) {
+$("#observable").on("domchange", function(event, changes) {
     console.log(changes[0].oldValue);
 });
 ```
